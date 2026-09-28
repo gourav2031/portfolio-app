@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mera Full-Stack Portfolio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0b1120; color: #f8fafc; padding: 20px; }
+    .container { max-width: 750px; margin: 0 auto; }
+    header { text-align: center; padding: 30px 0; border-bottom: 1px solid #1e293b; margin-bottom: 25px; }
+    h1 { color: #38bdf8; font-size: 2rem; margin-bottom: 8px; }
+    p { color: #94a3b8; }
+    .card { background: #1e293b; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #334155; }
+    h3 { margin-bottom: 12px; color: #f1f5f9; }
+    .skills span { background: #0284c7; color: white; padding: 6px 12px; border-radius: 15px; font-size: 13px; display: inline-block; margin: 4px; }
+    form { display: flex; flex-direction: column; gap: 10px; }
+    input, button { padding: 10px; border-radius: 6px; border: 1px solid #475569; font-size: 14px; }
+    input { background: #0f172a; color: white; }
+    button { background: #0284c7; color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; }
+    button:hover { background: #0369a1; }
+    .project-card { background: #0f172a; border: 1px solid #334155; padding: 15px; border-radius: 8px; margin-top: 12px; }
+    .project-card h4 { color: #38bdf8; margin-bottom: 5px; }
+    .project-card a { color: #67e8f9; text-decoration: none; font-size: 13px; display: inline-block; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Mera Portfolio 🚀</h1>
+      <p>Full-Stack Web Developer | HTML, CSS, JavaScript, Node.js</p>
+    </header>
+
+    <!-- Skills Section -->
+    <section class="card">
+      <h3>Tech Stack & Skills</h3>
+      <div class="skills">
+        <span>HTML5</span>
+        <span>CSS3</span>
+        <span>JavaScript</span>
+        <span>Node.js</span>
+        <span>Express.js</span>
+        <span>REST APIs</span>
+      </div>
+    </section>
+
+    <!-- Add Project Form Section -->
+    <section class="card">
+      <h3>Naya Project Add Karein</h3>
+      <form id="projectForm">
+        <input type="text" id="title" placeholder="Project Name" required>
+        <input type="text" id="desc" placeholder="Project Description" required>
+        <input type="url" id="link" placeholder="GitHub Link ya Demo URL" required>
+        <button type="submit">Project Save Karein</button>
+      </form>
+    </section>
+
+    <!-- Projects List from Backend -->
+    <section class="card">
+      <h3>Projects (Backend se live data)</h3>
+      <div id="projectList">Loading projects...</div>
+    </section>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api/projects';
+
+    // Backend se projects lana
+    async function loadProjects() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        const container = document.getElementById('projectList');
+        container.innerHTML = '';
+
+        data.forEach(p => {
+          const div = document.createElement('div');
+          div.className = 'project-card';
+          div.innerHTML = `
+            <h4>${p.title}</h4>
+            <p>${p.desc}</p>
+            <a href="${p.link}" target="_blank">View Project ↗</a>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        document.getElementById('projectList').innerHTML = 
+          '<p style="color: #ef4444;">Server offline hai. Pehle terminal me "node server.js" chalaayein!</p>';
+      }
+    }
+
+    // Form submit karke backend me save karna
+    document.getElementById('projectForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const desc = document.getElementById('desc').value;
+      const link = document.getElementById('link').value;
+
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, desc, link })
+      });
+
+      e.target.reset();
+      loadProjects();
+    });
+
+    loadProjects();
+  </script>
+</body>
+</html>
